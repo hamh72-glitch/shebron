@@ -66,14 +66,26 @@ header p{color:#666;font-size:1em}
 </div>
 </div>
 <script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyou0yrC0fmUx8p9Jt77KLRH0NeTQAW_nHOU7HNPeWLW-i5u_HWfEXrtq5-w6NNJs3LkA/exec';
+const SHEET_URL = 'https://docs.google.com/spreadsheets/d/18E7THN9AKHokla8XpP0hkTajTVlnULFbv0LBaZp1aRQ/export?format=csv';
 let d = [];
 
 function loadData() {
-    fetch(SCRIPT_URL)
-        .then(r => r.json())
-        .then(data => {
-            d = data;
+    fetch(SHEET_URL)
+        .then(r => r.text())
+        .then(csv => {
+            const rows = csv.split('\n');
+            d = [];
+            for(let i = 1; i < rows.length; i++){
+                const cols = rows[i].split(',');
+                if(cols[1]) d.push({
+                    name:cols[1]||'',
+                    dir:cols[2]||'',
+                    phone:cols[3]||'',
+                    nat:cols[4]||'',
+                    dPhone:cols[5]||'',
+                    reg:cols[6]||''
+                });
+            }
             [...new Set(d.map(s=>s.reg))].sort().forEach(r=>{
                 const o=document.createElement('option');
                 o.value=r;
@@ -84,7 +96,7 @@ function loadData() {
             fl();
         })
         .catch(e => {
-            document.getElementById('list').innerHTML='<div class="error"><h3>خطأ في تحميل البيانات</h3><p>تأكد من تفعيل Google Apps Script</p></div>';
+            document.getElementById('list').innerHTML='<div class="error"><h3>خطأ في تحميل البيانات</h3><p>تأكد من جعل الملف عام</p></div>';
         });
 }
 
